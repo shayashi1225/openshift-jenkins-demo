@@ -102,7 +102,7 @@ pipeline {
           echo "Publish to Nexus"
 
           // TBD: Publish to Nexus
-          sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::https://homework-nexus.apps.shared-na4.na4.openshift.opentlc.com"
+          sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::https://homework-nexus.apps.shared-na4.na4.openshift.opentlc.com/repository/releases"
         }
       }
     }
