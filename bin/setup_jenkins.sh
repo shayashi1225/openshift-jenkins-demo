@@ -53,27 +53,27 @@ oc create secret generic private-repo-secret --from-literal=username=shayashi-re
 # Make sure you use your secret to access the repository
 
 # TBD
-# echo 'apiVersion: v1
-# kind: "BuildConfig"
-# metadata:
-#     name: "tasks-pipeline"
-# spec:
-#     source:
-#       type: "Git"
-#       git:
-#         uri: "REPO"
-#       contextDir: "openshift-tasks"
-#     strategy:
-#       type: "JenkinsPipeline"
-#       jenkinsPipelineStrategy:
-#         jenkinsfilePath: Jenkinsfile
-#         env:
-#         - name: "GUID"
-#           value: "GUID-VALUE" '| sed -e s/REPO/${REPO}/g | sed -e s/GUID-VALUE/${GUID}/g | oc create -n ${GUID}-jenkins -f -
+echo 'apiVersion: v1
+kind: "BuildConfig"
+metadata:
+    name: "tasks-pipeline"
+spec:
+    source:
+      type: "Git"
+      git:
+        uri: "'${REPO}'"
+      contextDir: "openshift-tasks"
+    strategy:
+      type: "JenkinsPipeline"
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: Jenkinsfile
+        env:
+        - name: "GUID"
+          value: "'${GUID}'" '| oc create -n ${GUID}-jenkins -f -
 
-sed -i s/REPO/${REPO}/g manifests/tasks-pipeline-bc.yaml
-sed -i s/GUIDVALUE/${GUID}/g manifests/tasks-pipeline-bc.yaml
-oc create -f manifests/tasks-pipeline-bc.yaml -n ${GUID}-jenkins
+#sed -i s/REPO/${REPO}/g manifests/tasks-pipeline-bc.yaml
+#sed -i s/GUIDVALUE/${GUID}/g manifests/tasks-pipeline-bc.yaml
+#oc create -f manifests/tasks-pipeline-bc.yaml -n ${GUID}-jenkins
 
 oc set build-secret --source bc/tasks-pipeline private-repo-secret -n ${GUID}-jenkins
 
