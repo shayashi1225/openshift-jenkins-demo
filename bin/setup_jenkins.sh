@@ -72,7 +72,7 @@ oc create secret generic private-repo-secret --from-literal=username=shayashi-re
 #           value: "GUID-VALUE" '| sed -e s/REPO/${REPO}/g | sed -e s/GUID-VALUE/${GUID}/g | oc create -n ${GUID}-jenkins -f -
 
 sed -i s/REPO/${REPO}/g manifests/tasks-pipeline-bc.yaml
-sed -i s/GUID-VALUE/${GUID}/g manifests/tasks-pipeline-bc.yaml
+sed -i s/GUIDVALUE/${GUID}/g manifests/tasks-pipeline-bc.yaml
 oc create -f manifests/tasks-pipeline-bc.yaml -n ${GUID}-jenkins
 
 oc set build-secret --source bc/tasks-pipeline private-repo-secret -n ${GUID}-jenkins
