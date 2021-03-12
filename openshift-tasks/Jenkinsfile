@@ -201,50 +201,51 @@ pipeline {
     // -------------------------------------
     stage('Blue/Green Production Deployment') {
       steps {
-        script {
+        dir('openshift-tasks') {
+          script {
 
-          // TBD: Determine which application is active
-          //      Set Image, Set VERSION
-          //      (Re-)create ConfigMap
-          //      Deploy into the other application
-          //      Make sure the application is running and ready before proceeding
-          openshift.withCluster() {
-            openshift.withProject("${prodProject}") {
-        // TBD: 1. Determine which application is active
-              activeApp = openshift.selector("route", "tasks").object().spec.to.name
-              if (activeApp == "tasks-green") {
-                destApp = "tasks-blue"
+            // TBD: Determine which application is active
+            //      Set Image, Set VERSION
+            //      (Re-)create ConfigMap
+            //      Deploy into the other application
+            //      Make sure the application is running and ready before proceeding
+            openshift.withCluster() {
+              openshift.withProject("${prodProject}") {
+          // TBD: 1. Determine which application is active
+                activeApp = openshift.selector("route", "tasks").object().spec.to.name
+                if (activeApp == "tasks-green") {
+                  destApp = "tasks-blue"
+                }
+                echo "Active Application:      " + activeApp
+                echo "Destination Application: " + destApp
+
+          //      2. Update the image for the other application
+                def dc = openshift.selector("dc/${destApp}").object()
+  
+                dc.spec.template.spec.containers[0].image="image-registry.openshift-image-registry.svc:5000/${devProject}/${imageName}:${prodTag}"
+  
+          //      3. Deploy into the other application
+                openshift.apply(dc)
+
+          //      4. Recreate Config maps for other application
+                openshift.selector("configmap", "${destApp}-config").delete()
+                def configmap = openshift.create("configmap", "${destApp}-config", "--from-file=./configuration/application-users.properties", "--from-file=./configuration/application-roles.properties" )
+  
+                openshift.selector("dc", "${destApp}").rollout().latest();
+  
+          //      5. Wait until application is running
+                def dc_prod = openshift.selector("dc", "${destApp}").object()
+                def dc_version = dc_prod.status.latestVersion
+                def rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
+                echo "Waiting for ${destApp} to be ready"
+                while (rc_prod.spec.replicas != rc_prod.status.readyReplicas) {
+                  sleep 5
+                  rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
+                }
+
               }
-              echo "Active Application:      " + activeApp
-              echo "Destination Application: " + destApp
-
-        //      2. Update the image for the other application
-              def dc = openshift.selector("dc/${destApp}").object()
-
-              dc.spec.template.spec.containers[0].image="image-registry.openshift-image-registry.svc:5000/${devProject}/${imageName}:${prodTag}"
-
-        //      3. Deploy into the other application
-              openshift.apply(dc)
-
-        //      4. Recreate Config maps for other application
-              openshift.selector("configmap", "${destApp}-config").delete()
-              def configmap = openshift.create("configmap", "${destApp}-config", "--from-file=./configuration/application-users.properties", "--from-file=./configuration/application-roles.properties" )
-
-              openshift.selector("dc", "${destApp}").rollout().latest();
-
-        //      5. Wait until application is running
-              def dc_prod = openshift.selector("dc", "${destApp}").object()
-              def dc_version = dc_prod.status.latestVersion
-              def rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
-              echo "Waiting for ${destApp} to be ready"
-              while (rc_prod.spec.replicas != rc_prod.status.readyReplicas) {
-                sleep 5
-                rc_prod = openshift.selector("rc", "${destApp}-${dc_version}").object()
-              }
-
             }
           }
-
         }
       }
     }
