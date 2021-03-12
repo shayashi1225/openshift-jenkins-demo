@@ -64,7 +64,7 @@ spec:
     strategy:
       type: "JenkinsPipeline"
       jenkinsPipelineStrategy:
-        jenkinsfilePath: Jenkinsfile' | oc create -f -n ${GUID}-jenkins
+        jenkinsfilePath: Jenkinsfile' | oc create -n ${GUID}-jenkins -f -
 
 oc set build-secret --source bc/tasks-pipeline private-repo-secret -n ${GUID}-jenkins
 
