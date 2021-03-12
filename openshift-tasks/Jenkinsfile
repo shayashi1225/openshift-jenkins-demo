@@ -89,7 +89,7 @@ pipeline {
             // TBD: Execute Sonarqube Tests
             //      Your project name should be "${GUID}-${JOB_BASE_NAME}-${devTag}"
             //      Your project version should be ${devTag}
-            sh "${mvnCmd} admin:r3dh4t1! -Dsonar.projectName=${GUID}-${JOB_BASE_NAME}-${devTag} -Dsonar.projectVersion=${devTag} -Dsonar.host.url=http://homework-sonarqube.apps.shared-na4.na4.openshift.opentlc.com"
+            sh "${mvnCmd} sonar:sonar -Dsonar.projectName=${GUID}-${JOB_BASE_NAME}-${devTag} -Dsonar.projectVersion=${devTag} -Dsonar.host.url=http://homework-sonarqube.apps.shared-na4.na4.openshift.opentlc.com"
 
           }
         }

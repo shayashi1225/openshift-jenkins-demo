@@ -61,12 +61,15 @@ spec:
     source:
       type: "Git"
       git:
-        uri: "${REPO}"
+        uri: "REPO"
       contextDir: "openshift-tasks"
     strategy:
       type: "JenkinsPipeline"
       jenkinsPipelineStrategy:
-        jenkinsfilePath: Jenkinsfile' | oc create -n ${GUID}-jenkins -f -
+        jenkinsfilePath: Jenkinsfile
+        env:
+        - name: "GUID"
+          value: "GUID-VALUE" '| sed -e s/REPO/${REPO}/g | sed -e s/GUID-VALUE/${GUID}/g | oc create -n ${GUID}-jenkins -f -
 
 oc set build-secret --source bc/tasks-pipeline private-repo-secret -n ${GUID}-jenkins
 
