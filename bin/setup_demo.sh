@@ -71,6 +71,10 @@ chmod +x setup_nexus3.sh
 ./setup_nexus3.sh admin $NEXUS_PASSWORD http://$(oc get route nexus --template='{{ .spec.host }}' -n ${CICD_NM})
 rm setup_nexus3.sh
 
+oc expose dc nexus --port=5000 --name=nexus-registry -n ${CICD_NM}
+oc create route edge nexus-registry --service=nexus-registry --port=5000 -n ${CICD_NM}
+
+
 
 # Regist source to Gogs repository
 GOGS_SVC=$(oc get route gogs -o template --template='{{.spec.host}}' -n ${CICD_NM})
