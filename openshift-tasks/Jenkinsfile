@@ -5,7 +5,7 @@
 pipeline {
   agent {
     kubernetes {
-      label "maven"
+      label "maven-skopeo-agent"
       cloud "openshift"
     }
   }
