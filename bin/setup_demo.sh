@@ -54,17 +54,22 @@ oc apply -f manifests/tasks-svc-green.yaml -n ${GUID}-tasks-prod
 oc apply -f manifests/tasks-route-prod.yaml -n ${GUID}-tasks-prod
 
 # Create Jenkins Agent
-oc new-build --strategy=docker -D $'FROM registry.access.redhat.com/ubi8/go-toolset:latest as builder\n
-ENV SKOPEO_VERSION=v1.0.0\n
-RUN git clone -b $SKOPEO_VERSION https://github.com/containers/skopeo.git && cd skopeo/ && make binary-local DISABLE_CGO=1\n
-FROM image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-maven:v4.0 as final\n
-USER root\n
-RUN mkdir /etc/containers\n
-COPY --from=builder /opt/app-root/src/skopeo/default-policy.json /etc/containers/policy.json\n
-COPY --from=builder /opt/app-root/src/skopeo/skopeo /usr/bin\n
-USER 1001' --name=jenkins-agent-appdev -n ${CICD_NM}
+#oc new-build --strategy=docker -D $'FROM registry.access.redhat.com/ubi8/go-toolset:latest as builder\n
+#ENV SKOPEO_VERSION=v1.0.0\n
+#RUN git clone -b $SKOPEO_VERSION https://github.com/containers/skopeo.git && cd skopeo/ && make binary-local DISABLE_CGO=1\n
+#FROM image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-maven:v4.0 as final\n
+#USER root\n
+#RUN mkdir /etc/containers\n
+#COPY --from=builder /opt/app-root/src/skopeo/default-policy.json /etc/containers/policy.json\n
+#COPY --from=builder /opt/app-root/src/skopeo/skopeo /usr/bin\n
+#USER 1001' --name=jenkins-agent-appdev -n ${CICD_NM}
 
-sed s/GUID-jenkins/${CICD_NM}/g manifests/agent-cm.yaml | oc create -n ${CICD_NM} -f -
+#sed s/GUID-jenkins/${CICD_NM}/g manifests/agent-cm.yaml | oc create -n ${CICD_NM} -f -
+NEXUS_PASSWORD=admin123
+curl -o setup_nexus3.sh -s https://raw.githubusercontent.com/redhat-gpte-devopsautomation/ocp_advanced_development_resources/master/nexus/setup_nexus3.sh
+chmod +x setup_nexus3.sh
+./setup_nexus3.sh admin $NEXUS_PASSWORD http://$(oc get route nexus --template='{{ .spec.host }}' -n ${CICD_NM})
+rm setup_nexus3.sh
 
 
 # Regist source to Gogs repository
