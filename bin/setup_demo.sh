@@ -15,7 +15,7 @@ oc new-project ${GUID}-tasks-prod --display-name="${GUID} AdvDev Homework Tasks 
 
 echo "Setting up Tasks Development Environment in project ${GUID}-tasks-dev"
 # Set up Dev Project
-oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-tasks-dev
+oc policy add-role-to-user edit system:serviceaccount:${CICD_NM}:jenkins -n ${GUID}-tasks-dev
 
 # Set up Dev Application
 oc apply -f manifests/tasks-cm-dev.yaml -n ${GUID}-tasks-dev
@@ -36,7 +36,7 @@ echo "Setting up Tasks Production Environment in project ${GUID}-tasks-prod"
 
 # Set up Production Project
 oc policy add-role-to-group system:image-puller system:serviceaccounts:${GUID}-tasks-prod -n ${GUID}-tasks-dev
-oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-tasks-prod
+oc policy add-role-to-user edit system:serviceaccount:${CICD_NM}:jenkins -n ${GUID}-tasks-prod
 
 # Set up Blue Application
 oc apply -f manifests/tasks-cm-blue.yaml -n ${GUID}-tasks-prod
