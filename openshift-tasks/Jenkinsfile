@@ -89,7 +89,7 @@ pipeline {
             // TBD: Execute Sonarqube Tests
             //      Your project name should be "${GUID}-${JOB_BASE_NAME}-${devTag}"
             //      Your project version should be ${devTag}
-            sh "${mvnCmd} sonar:sonar -Dsonar.projectName=${GUID}-${JOB_BASE_NAME}-${devTag} -Dsonar.projectVersion=${devTag} -Dsonar.host.url=http://homework-sonarqube.apps.shared-na4.na4.openshift.opentlc.com"
+            sh "${mvnCmd} sonar:sonar -Dsonar.projectName=${GUID}-${JOB_BASE_NAME}-${devTag} -Dsonar.projectVersion=${devTag} -Dsonar.host.url=http://sonarqube:9000"
 
           }
         }
@@ -102,7 +102,7 @@ pipeline {
           echo "Publish to Nexus"
 
           // TBD: Publish to Nexus
-          sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::https://homework-nexus.apps.shared-na4.na4.openshift.opentlc.com/repository/releases"
+          sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::https://nexus:8081/repository/releases"
         }
       }
     }
@@ -117,7 +117,7 @@ pipeline {
             //      Make sure the image name is correct in the tag!
             openshift.withCluster() {
               openshift.withProject("${devProject}") {
-                openshift.selector("bc", "tasks").startBuild("--from-file=https://homework-nexus.apps.shared-na4.na4.openshift.opentlc.com/repository/releases/org/jboss/quickstarts/eap/${GUID}-tasks/${prodTag}/${GUID}-tasks-${prodTag}.war", "--wait=true")
+                openshift.selector("bc", "tasks").startBuild("--from-file=https://nexus:8081/repository/releases/org/jboss/quickstarts/eap/${GUID}-tasks/${prodTag}/${GUID}-tasks-${prodTag}.war", "--wait=true")
 
                 openshift.tag("${imageName}:latest", "${imageName}:${devTag}")
               }
@@ -187,7 +187,7 @@ pipeline {
         script {
 
           // TBD: Copy image to Nexus container registry
-          sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:redhat docker://image-registry.openshift-image-registry.svc.cluster.local:5000/${devProject}/${imageName}:${devTag} docker://homework-nexus-registry.apps.shared-na4.na4.openshift.opentlc.com/${imageName}:${devTag}"
+          sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:redhat docker://image-registry.openshift-image-registry.svc.cluster.local:5000/${devProject}/${imageName}:${devTag} docker://nexus:8081/${imageName}:${devTag}"
 
           // TBD: Tag the built image with the production tag.
           openshift.withCluster() {
