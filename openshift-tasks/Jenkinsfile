@@ -89,7 +89,7 @@ pipeline {
             // TBD: Execute Sonarqube Tests
             //      Your project name should be "${GUID}-${JOB_BASE_NAME}-${devTag}"
             //      Your project version should be ${devTag}
-            sh "${mvnCmd} sonar:sonar -Dsonar.projectName=${GUID}-${JOB_BASE_NAME}-${devTag} -Dsonar.projectVersion=${devTag} -Dsonar.host.url=http://sonarqube:9000"
+            sh "${mvnCmd} sonar:sonar -Dsonar.projectName=${GUID}-${JOB_BASE_NAME}-${devTag} -Dsonar.projectVersion=${devTag} -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=admin -Dsonar.password=admin"
 
           }
         }
