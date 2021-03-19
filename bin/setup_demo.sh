@@ -66,10 +66,10 @@ oc apply -f manifests/tasks-route-prod.yaml -n ${GUID}-tasks-prod
 
 #sed s/GUID-jenkins/${CICD_NM}/g manifests/agent-cm.yaml | oc create -n ${CICD_NM} -f -
 NEXUS_PASSWORD=admin123
-curl -o setup_nexus3.sh -s https://raw.githubusercontent.com/redhat-gpte-devopsautomation/ocp_advanced_development_resources/master/nexus/setup_nexus3.sh
-chmod +x setup_nexus3.sh
-./setup_nexus3.sh admin $NEXUS_PASSWORD http://$(oc get route nexus --template='{{ .spec.host }}' -n ${CICD_NM})
-rm setup_nexus3.sh
+#curl -o setup_nexus3.sh -s https://raw.githubusercontent.com/redhat-gpte-devopsautomation/ocp_advanced_development_resources/master/nexus/setup_nexus3.sh
+#chmod +x setup_nexus3.sh
+bin/setup_nexus3.sh admin $NEXUS_PASSWORD http://$(oc get route nexus --template='{{ .spec.host }}' -n ${CICD_NM})
+#rm setup_nexus3.sh
 
 oc expose dc nexus --port=5000 --name=nexus-registry -n ${CICD_NM}
 oc create route edge nexus-registry --service=nexus-registry --port=5000 -n ${CICD_NM}
