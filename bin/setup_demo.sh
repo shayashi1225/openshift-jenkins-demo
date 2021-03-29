@@ -1,11 +1,11 @@
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
     echo "Usage:"
-    echo "  $0 GUID CICD_NameSpace"
+    echo "  $0 CICD_NameSpace"
     exit 1
 fi
 
-GUID=$1
-CICD_NM=$2
+GUID=jenkins
+CICD_NM=$1
 
 echo "Creating Demo Projects for GUID=${GUID}"
 #oc new-project ${GUID}-jenkins    --display-name="${GUID} AdvDev Homework Jenkins"

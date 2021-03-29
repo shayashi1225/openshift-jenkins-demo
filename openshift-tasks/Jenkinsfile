@@ -16,6 +16,8 @@ pipeline {
     //       needs the "scl_enable" before calling maven.
     mvnCmd = "mvn -s ./nexus_settings.xml"
 
+    GUID="jenkins"
+
     // Images and Projects
     imageName   = "${GUID}-tasks"
     devProject  = "${GUID}-tasks-dev"
