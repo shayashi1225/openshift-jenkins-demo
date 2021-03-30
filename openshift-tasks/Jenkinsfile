@@ -144,7 +144,7 @@ pipeline {
               // OpenShift 4
         // 1. Update the image on the dev deployment config
                 openshift.set("image", "dc/tasks", "tasks=image-registry.openshift-image-registry.svc:5000/${devProject}/${imageName}:${devTag}")
-
+                openshift.set("env", "dc/tasks", "VERSION=${devTag}")
               // Recreate the Config Map which contains the users for the Tasks application
               // (just in case the properties files changed in the latest commit)
         // 2. Recreate the config maps with the potentially changed properties files
@@ -228,9 +228,11 @@ pipeline {
                 def dc = openshift.selector("dc/${destApp}").object()
   
                 dc.spec.template.spec.containers[0].image="image-registry.openshift-image-registry.svc:5000/${devProject}/${imageName}:${prodTag}"
-  
+//                dc.spec.template.spec.containers[0].env="[{"name": "VERSION", "value": ${prodTag}-${destApp}}]"
+//[[name:VERSION, value:0.0 (tasks-blue)]]
           //      3. Deploy into the other application
                 openshift.apply(dc)
+                openshift.set("env", "dc/${destApp}", "VERSION=${prodTag}-${destApp}")
 
           //      4. Recreate Config maps for other application
                 openshift.selector("configmap", "${destApp}-config").delete()
